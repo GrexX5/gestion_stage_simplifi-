@@ -46,12 +46,23 @@ class ApplicationController extends Controller
         if ($exists) {
             return redirect()->back()->with('error', 'Vous avez déjà postulé à cette offre.');
         }
-        \App\Models\Application::create([
+        $application = \App\Models\Application::create([
             'student_id' => $student->id,
             'internship_id' => $internshipId,
             'status' => 'pending',
         ]);
-        return redirect()->route('applications.index')->with('success', 'Candidature envoyée.');
+
+        // Créer automatiquement une convention pour cette candidature
+        $convention = new \App\Models\Convention([
+            'application_id' => $application->id,
+            'status' => 'pending',
+            'teacher_validated' => false,
+            'company_validated' => false,
+        ]);
+        $convention->save();
+
+        return redirect()->route('applications.index')
+            ->with('success', 'Candidature envoyée. Une convention a été créée et est en attente de validation.');
     }
 
     // Détail d'une candidature
