@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home');
+})->name('home');
 
 use App\Http\Controllers\AuthController;
 
@@ -35,4 +35,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('conventions/{id}/validate', [App\Http\Controllers\ConventionController::class, 'validate'])->name('conventions.validate');
     Route::post('conventions/{id}/reject', [App\Http\Controllers\ConventionController::class, 'reject'])->name('conventions.reject');
     Route::post('conventions/generate', [App\Http\Controllers\ConventionController::class, 'generate'])->name('conventions.generate');
+    Route::get('conventions/{id}/download', [App\Http\Controllers\ConventionController::class, 'download'])->name('conventions.download');
 });

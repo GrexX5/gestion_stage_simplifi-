@@ -19,50 +19,66 @@ class InternshipController extends Controller
         // Filtres étudiants
         if ($user->role === 'student') {
             if ($search) {
-                $query->where('title', 'like', "%$search%")
+                $query->where(function($q) use ($search) {
+                    $q->where('title', 'like', "%$search%")
                       ->orWhere('description', 'like', "%$search%")
-                      ->orWhere('skills', 'like', "%$search%") ;
+                      ->orWhere('skills', 'like', "%$search%");
+                });
             }
             if ($duration) {
                 $query->where('duration', $duration);
             }
             if ($skills) {
-                $query->where('skills', 'like', "%$skills%") ;
+                $query->where('skills', 'like', "%$skills%");
             }
-            $internships = $query->get();
         } elseif ($user->role === 'company') {
             $company = $user->company;
-            $internships = $company ? $company->internships()->with('applications.student.user')->get() : collect();
-        } else {
-            $internships = $query->get();
+            if ($company) {
+                $query = $company->internships()->with('applications.student.user');
+            } else {
+                $query->whereNull('id'); // Retourne une requête vide
+            }
         }
+
+        // Pagination avec 10 éléments par page
+        $internships = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('internships.index', compact('internships', 'search', 'duration', 'skills'));
     }
 
     // Formulaire création
     public function create()
     {
-        return view('internships.create');
+        $companies = \App\Models\Company::all();
+        return view('internships.create', compact('companies'));
     }
 
     // Enregistrer un stage
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'duration' => 'required',
-            'skills' => 'required',
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'duration' => 'required|integer|min:1|max:12',
+            'skills' => 'required|array|min:1',
+            'skills.*' => 'string|max:255',
         ]);
+
         $company = Auth::user()->company;
+        
+        // Convertir le tableau des compétences en chaîne séparée par des virgules
+        $skillsString = is_array($validated['skills']) 
+            ? implode(', ', $validated['skills'])
+            : $validated['skills'];
+
         \App\Models\Internship::create([
             'company_id' => $company->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'duration' => $request->duration,
-            'skills' => $request->skills,
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'duration' => $validated['duration'],
+            'skills' => $skillsString,
         ]);
-        return redirect()->route('internships.index')->with('success', 'Stage créé.');
+
+        return redirect()->route('internships.index')->with('success', 'Stage créé avec succès.');
     }
 
     // Afficher un stage
@@ -88,15 +104,24 @@ class InternshipController extends Controller
     // Mise à jour d'un stage
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'duration' => 'required',
-            'skills' => 'required',
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'duration' => 'required|integer|min:1|max:12',
+            'skills' => 'required|array|min:1',
+            'skills.*' => 'string|max:255',
         ]);
+
         $internship = \App\Models\Internship::findOrFail($id);
-        $internship->update($request->only(['title', 'description', 'duration', 'skills']));
-        return redirect()->route('internships.index')->with('success', 'Stage mis à jour.');
+        
+        // Convertir le tableau des compétences en chaîne séparée par des virgules
+        $validated['skills'] = is_array($validated['skills']) 
+            ? implode(', ', $validated['skills'])
+            : $validated['skills'];
+            
+        $internship->update($validated);
+        
+        return redirect()->route('internships.index')->with('success', 'Stage mis à jour avec succès.');
     }
 
     // Suppression d'un stage

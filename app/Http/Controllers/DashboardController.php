@@ -33,14 +33,20 @@ class DashboardController extends Controller
     }
     public function companyDashboard()
     {
-        $company = Auth::user()->company;
-        $internshipsCount = $company ? $company->internships()->count() : 0;
-        $applicationsCount = $company ? \App\Models\Application::whereHas('internship', function($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })->count() : 0;
+        $user = Auth::user();
+        $company = $user->company;
+        
+        if (!$company) {
+            return redirect()->route('company.profile.create')
+                ->with('warning', 'Veuillez compléter votre profil entreprise avant d\'accéder au tableau de bord.');
+        }
+        
         return view('dashboard_company', [
-            'internshipsCount' => $internshipsCount,
-            'applicationsCount' => $applicationsCount,
+            'company' => $company,
+            'internships' => $company->internships()->withCount('applications')->latest()->take(5)->get(),
+            'applications' => $company->internships()->with(['applications' => function($query) {
+                $query->with('student')->latest()->take(5);
+            }])->get()->pluck('applications')->flatten(),
         ]);
     }
 
