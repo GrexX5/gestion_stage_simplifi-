@@ -108,16 +108,23 @@ class InternshipController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'duration' => 'required|integer|min:1|max:12',
-            'skills' => 'required|array|min:1',
-            'skills.*' => 'string|max:255',
+            'skills' => 'required|string',
+            'start_date' => 'required|date',
+            'location' => 'required|string|max:255',
+            'remuneration' => 'nullable|numeric|min:0',
+            'is_published' => 'sometimes|boolean',
         ]);
 
         $internship = \App\Models\Internship::findOrFail($id);
         
-        // Convertir le tableau des compétences en chaîne séparée par des virgules
-        $validated['skills'] = is_array($validated['skills']) 
-            ? implode(', ', $validated['skills'])
-            : $validated['skills'];
+        // Nettoyer et formater les compétences
+        $skills = array_map('trim', explode(',', $validated['skills']));
+        $skills = array_filter($skills, function($skill) {
+            return !empty($skill);
+        });
+        
+        // Mettre à jour les données validées avec les compétences formatées
+        $validated['skills'] = implode(', ', $skills);
             
         $internship->update($validated);
         

@@ -280,7 +280,7 @@
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary">
+                            <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#profileSettingsModal">
                                 <i class="fas fa-cog"></i>
                                 <span>Paramètres</span>
                             </a>

@@ -40,21 +40,38 @@ class ApplicationController extends Controller
         
         $student = $user->student;
         $internshipId = $request->internship_id;
+        
         // Empêcher la double candidature
         $exists = \App\Models\Application::where('student_id', $student->id)
             ->where('internship_id', $internshipId)->exists();
+            
         if ($exists) {
             return redirect()->back()->with('error', 'Vous avez déjà postulé à cette offre.');
         }
+        
         $application = \App\Models\Application::create([
             'student_id' => $student->id,
             'internship_id' => $internshipId,
+            'application_date' => now(),
             'status' => 'pending',
         ]);
 
+        // Récupérer l'entreprise liée au stage
+        $internship = \App\Models\Internship::findOrFail($internshipId);
+        
+        // Vérifier et définir les dates par défaut si nécessaire
+        $startDate = $internship->start_date ?? now()->addWeek()->startOfWeek(); // Par défaut, dans une semaine
+        $endDate = $internship->end_date ?? $startDate->copy()->addMonths(2); // Par défaut, 2 mois après la date de début
+        
         // Créer automatiquement une convention pour cette candidature
         $convention = new \App\Models\Convention([
             'application_id' => $application->id,
+            'student_id' => $student->id,
+            'company_id' => $internship->company_id,
+            'internship_id' => $internshipId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'signature_date' => now(),
             'status' => 'pending',
             'teacher_validated' => false,
             'company_validated' => false,

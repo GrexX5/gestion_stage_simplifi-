@@ -110,11 +110,11 @@
                             <i class="fas fa-check-circle me-1"></i> Vous avez déjà postulé
                         </button>
                     @else
-                        <form action="{{ route('applications.store') }}" method="POST">
+                        <form action="{{ route('applications.store') }}" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="internship_id" value="{{ $internship->id }}">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane me-1"></i> Postuler à cette offre
+                            <button type="submit" class="btn btn-primary btn-lg px-4" onclick="return confirm('Êtes-vous sûr de vouloir postuler à cette offre ?')">
+                                <i class="fas fa-paper-plane me-2"></i> Postuler à cette offre
                             </button>
                         </form>
                     @endif

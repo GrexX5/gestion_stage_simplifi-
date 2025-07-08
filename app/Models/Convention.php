@@ -9,10 +9,24 @@ class Convention extends Model
 {
     protected $fillable = [
         'application_id',
+        'student_id',
+        'company_id',
+        'internship_id',
+        'start_date',
+        'end_date',
+        'signature_date',
         'status',
         'document',
         'teacher_validated',
         'company_validated'
+    ];
+    
+    protected $dates = [
+        'start_date',
+        'end_date',
+        'signature_date',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [

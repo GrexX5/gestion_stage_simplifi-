@@ -41,4 +41,21 @@ class ActivityLogger
 
         $activity->log($description);
     }
+
+    /**
+     * Log when an application is received
+     *
+     * @param \App\Models\Application $application
+     * @return void
+     */
+    public static function logApplicationReceived($application)
+    {
+        $studentName = $application->student->user->name;
+        $internshipTitle = $application->internship->title;
+        
+        activity()
+            ->causedBy($application->student->user)
+            ->performedOn($application)
+            ->log("Nouvelle candidature de {$studentName} pour le stage : {$internshipTitle}");
+    }
 }

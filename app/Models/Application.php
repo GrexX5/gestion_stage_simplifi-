@@ -10,6 +10,7 @@ class Application extends Model
     protected $fillable = [
         'student_id',
         'internship_id',
+        'application_date',
         'status',
         'rejection_reason',
         'submitted_at',
@@ -89,9 +90,7 @@ class Application extends Model
                 ActivityLogger::log(
                     $description,
                     $application,
-                    'application',
-                    'updated',
-                    ['changes' => $changes]
+                    ['type' => 'application', 'action' => 'updated', 'changes' => $changes]
                 );
             }
         });
@@ -101,9 +100,9 @@ class Application extends Model
             ActivityLogger::log(
                 'Candidature supprimée pour l\'offre : ' . ($application->internship->title ?? ''),
                 $application,
-                'application',
-                'deleted',
                 [
+                    'type' => 'application',
+                    'action' => 'deleted',
                     'internship_title' => $application->internship->title ?? null,
                     'student_name' => $application->student->user->name ?? null
                 ]
