@@ -29,7 +29,7 @@
                         </a>
                     @endguest
                 </div>
-                <div class="mt-4 text-center">
+                {{-- <div class="mt-4 text-center">
                     <p class="mb-0 text-muted">Rejoignez plus de <span class="fw-bold">1 500</span> utilisateurs satisfaits</p>
                     <div class="text-warning">
                         <i class="fas fa-star"></i>
@@ -38,7 +38,8 @@
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star-half-alt"></i>
                         <span class="text-muted ms-1">4.8/5</span>
-                    </div>
+                    </div> --}}
+                    
                 </div>
             </div>
         </div>
@@ -118,10 +119,10 @@
                 <div class="card h-100 border-0 shadow-sm hover-lift">
                     <div class="card-body p-4">
                         <div class="bg-purple bg-opacity-10 p-3 rounded-3 d-inline-block mb-4">
-                            <i class="fas fa-mobile-alt text-purple fs-2"></i>
+                            <i class="fas fa-chart-line text-purple fs-2"></i>
                         </div>
-                        <h3 class="h5 fw-bold mb-3">Accès mobile</h3>
-                        <p class="text-muted mb-0">Accédez à votre espace depuis n'importe quel appareil, où que vous soyez.</p>
+                        <h3 class="h5 fw-bold mb-3">Rapports et statistiques</h3>
+                        <p class="text-muted mb-0">Générez des rapports détaillés et analysez vos données de stage pour un meilleur suivi.</p>
                     </div>
                 </div>
             </div>
